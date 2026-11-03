@@ -1,0 +1,16 @@
+{
+  "name": "seo-skills",
+  "owner": { "name": "shaul1991", "url": "https://github.com/shaul1991" },
+  "metadata": {
+    "description": "Google·네이버·X·카카오톡 SEO Skill 조합",
+    "version": "0.1.0",
+    "repository": "https://github.com/shaul1991/seo-skills"
+  },
+  "plugins": [
+    {
+      "name": "seo-skills",
+      "description": "seo-orchestrator가 google-search, naver-search, structured-data, social-preview, indexnow, scaled-pages를 조합합니다.",
+      "source": "./"
+    }
+  ]
+}

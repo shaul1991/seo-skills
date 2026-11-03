@@ -1,0 +1,13 @@
+{
+  "name": "seo-skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Google·네이버·X·카카오톡 SEO Skill 묶음과 점검 스크립트",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "check": "node skills/seo-orchestrator/scripts/seo-check.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
