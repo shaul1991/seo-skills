@@ -38,6 +38,18 @@ Google·네이버·Daum(카카오)·Bing·Brave·DuckDuckGo·Apple 검색, ChatG
 - Meta 링크 미리보기 크롤러는 og 태그가 응답 **첫 1MB 안**에 있어야 하고 gzip·deflate를 요구합니다.
 - **AI 검색 노출이 기본값입니다.** Claude 웹 검색은 Brave Search를 씁니다(Anthropic 하위 처리자 목록) → Brave 색인(=Googlebot 크롤링 가능)이 Claude 노출 조건. ChatGPT는 `OAI-SearchBot` 허용과 OpenAI IP를 막지 않는 CDN이 포함 조건. Grok은 웹 검색과 X 게시물 검색을 쓰며 xAI는 크롤러 UA를 공개하지 않습니다. `Google-Extended`를 막으면 Gemini 앱 그라운딩에서 빠집니다.
 
+## 다른 Skill과 함께 쓰기
+
+SEO는 이 저장소로 하고, 다루지 않는 일만 다른 Skill을 필요한 것만 골라 씁니다.
+
+- 마케팅 문맥(대상·차별점·톤): [marketingskills `product-marketing`](https://github.com/coreyhaines31/marketingskills/tree/main/skills/product-marketing)
+- 콘텐츠 기획(주제·우선순위·일정): [marketingskills `content-strategy`](https://github.com/coreyhaines31/marketingskills/tree/main/skills/content-strategy)
+- 기술 SEO 점검 Skill(marketingskills `seo-audit` 등)은 함께 설치하지 않습니다(역할 중복).
+
+```bash
+npx skills add coreyhaines31/marketingskills -s product-marketing content-strategy -a claude-code -a codex
+```
+
 ## 설치
 
 [skills CLI](https://github.com/vercel-labs/skills)로 프로젝트에 설치:

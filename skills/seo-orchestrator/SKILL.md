@@ -24,6 +24,21 @@ description: >-
 | `scaled-pages` | 지역·날짜·카테고리 조합 페이지를 대량으로 만들 때의 품질 기준(얇은 페이지·도어웨이 회피) |
 | `browser-compat` | Brave Shields·De-AMP, 파비콘·theme-color·manifest, 브라우저별 표시·측정 |
 
+## 다른 Skill과의 경계
+
+SEO(발견·색인·표시·AI 검색 노출)는 이 저장소가 맡습니다. 아래처럼 성격이 다른 일은 다루지 않으며, 필요하면 그 Skill을 따로 씁니다.
+
+| 일 | 이 저장소 | 다른 Skill 예시 |
+| --- | --- | --- |
+| 크롤링·색인·메타·구조화 데이터·공유 미리보기·AI 크롤러·검색엔진 등록 | ✅ | — |
+| 대상 사용자·차별점·고객 언어·브랜드 톤(마케팅 문맥) | 읽기만 | [marketingskills `product-marketing`](https://github.com/coreyhaines31/marketingskills/tree/main/skills/product-marketing) |
+| 무엇을 만들지·주제 묶음·발행 일정(콘텐츠 기획) | 읽기만 | [marketingskills `content-strategy`](https://github.com/coreyhaines31/marketingskills/tree/main/skills/content-strategy) |
+| UI 디자인 | — | Impeccable 등 |
+
+- 프로젝트에 마케팅 문맥 문서(예: `.agents/product-marketing.md`, `PRODUCT.md`)나 콘텐츠 계획이 있으면 **먼저 읽고** 제목·설명 문구와 색인할 페이지 판단에 씁니다. 없으면 만들지 않고 진행합니다.
+- 같은 기술 SEO 점검 Skill(예: marketingskills `seo-audit`)과 함께 켜면 지시가 겹칩니다. 하나만 씁니다.
+- `scaled-pages`는 "만든 페이지를 색인할지"까지만 다룹니다. "어떤 페이지를 만들지"는 콘텐츠 기획 쪽입니다.
+
 ## 1. 먼저 정할 것
 
 질문은 최대 3개. 코드에서 알 수 있는 것은 묻지 않습니다.
