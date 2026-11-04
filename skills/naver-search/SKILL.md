@@ -67,6 +67,7 @@ Sitemap: https://www.example.com/sitemap.xml
 
 - 반응형이면 `<meta name="viewport" content="width=device-width, initial-scale=1">`. 별도 모바일 URL이면 1:1 대응 URL을 명시하고 기기별 리다이렉트는 HTTP로.
 - 파비콘: 정사각형 16px 이상(32px 이상 권장), ICO·PNG·GIF·JPEG·APNG·SVG. `<link rel="icon" href="https://절대경로">`(상대 경로 아님). URL을 자주 바꾸지 않고 robots.txt로 막지 않습니다.
+  - ⚠️ Next.js의 파일 규칙(`app/icon.*`, `app/apple-icon.*`, `favicon.ico`)은 `metadataBase`를 설정해도 `<link href>`를 **상대 경로**로 냅니다(Next 16 `resolve-icons` 확인). 절대 경로가 필요하면 아이콘을 일반 경로(예: `app/brand/icon-64.png/route.tsx`)로 제공하고 `metadata.icons`에 운영 도메인 절대 URL을 넣습니다.
 - 출처: [모바일 사용성](https://searchadvisor.naver.com/guide/markup-mobile), [파비콘](https://searchadvisor.naver.com/guide/markup-favicon)
 
 ## RSS·사이트맵 제출(콘텐츠 피드)

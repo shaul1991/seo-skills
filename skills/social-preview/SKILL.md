@@ -83,6 +83,13 @@ curl -v --compressed -H "Range: bytes=0-524288" -H "Connection: close" \
 - 크롤러 `Twitterbot`: robots.txt에서 막지 않습니다(`User-agent: Twitterbot` / `Disallow:`). TLS 1.1 이상 필요. 이미지는 보통 5MB까지 내려받고, 144×144 미만은 권장 크기 미달.
 - 네이버 가이드 예시에는 `twitter:domain`도 있습니다(X 공식 필수 태그 아님).
 
+## 구현 메모 (실전에서 걸린 것, 2026-11-04 parenting-hub)
+
+- **페이지별 OG 이미지:** 네이버는 사이트 공통 로고·배너를 썸네일로 쓰지 않을 수 있어 상세 페이지마다 고유 이미지가 좋습니다. Next.js라면 `app/<경로>/opengraph-image.tsx` + `next/og`의 `ImageResponse`(1200×630 PNG)로 제목·날짜·장소를 그립니다. 없는 값은 "미발표·미확인"으로 쓰고 만들지 않습니다.
+- **한글 서체가 필요합니다.** `ImageResponse`(Satori) 기본 서체에는 한글이 없어 빈칸으로 나옵니다. OFL 서체(예: Pretendard, Noto Sans KR)의 woff/ttf를 저장소에 두고 `fonts` 옵션으로 넘깁니다(woff2는 안 됨). 서브셋이면 드문 글자가 빠질 수 있습니다.
+- **X 카드:** Next.js는 `opengraph-image`가 있으면 `twitter:image`도 채웁니다. `twitter.card: 'summary_large_image'`만 메타데이터에 넣으면 됩니다.
+- **`trailingSlash: true`이면** 생성된 og:image URL(`.../opengraph-image?해시`)이 308로 `/`가 붙은 주소로 한 번 리다이렉트됩니다. 대부분의 크롤러는 따라가지만, 카카오·Meta 공유 디버거로 실제 표시를 확인합니다.
+
 ## 점검 순서
 
 1. 서버 HTML의 `<head>`에 og·twitter 태그가 있는지(클라이언트 JS로만 넣으면 대부분의 미리보기 크롤러가 못 읽음 — 일반적 관찰, 플랫폼별 보장 없음).
