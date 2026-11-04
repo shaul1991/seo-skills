@@ -64,6 +64,11 @@
 | [DuckDuckGo 결과 출처](https://duckduckgo.com/duckduckgo-help-pages/results/sources), [DuckDuckBot](https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot) | verified | |
 | [Applebot에 관하여](https://support.apple.com/ko-kr/119829) | verified | |
 | [OpenAI 크롤러](https://developers.openai.com/api/docs/bots), [Perplexity 크롤러](https://docs.perplexity.ai/docs/resources/perplexity-crawlers), [Anthropic 크롤러(2026-04-08)](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler) | verified | |
+| [ChatGPT 검색 도움말](https://help.openai.com/en/articles/9237897-searching-the-web-with-chatgpt) | verified | OAI-SearchBot·IP 허용이 포함 조건 |
+| [Anthropic 하위 처리자](https://trust.anthropic.com/subprocessors) | verified | Brave Search = Web Search(모든 제품) |
+| [xAI Web Search](https://docs.x.ai/developers/tools/web-search), [X Search](https://docs.x.ai/developers/tools/x-search), [docs.x.ai 사이트맵](https://docs.x.ai/sitemap.xml) | verified | 크롤러 문서 없음 확인 |
+| [Google 일반 크롤러(Google-Extended)](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers?hl=ko) | verified | Gemini 앱 그라운딩 포함 |
+| [Mistral 크롤러](https://docs.mistral.ai/robots) | verified | |
 | [MDN theme-color](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/theme-color), [MDN Web app manifest](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest) | verified | |
 | Daum 검색 도움말: [웹문서 검색이란(로봇 안내)](https://cs.daum.net/faq/service/15/category/4118/detail/28961), [웹문서 노출](https://cs.daum.net/faq/service/15/category/4118/detail/28967), [웹마스터도구 PIN](https://cs.daum.net/faq/service/15/category/4118/detail/38321), [검색등록 목록](https://cs.daum.net/faq/service/15/category/9334), [연관 채널](https://cs.daum.net/faq/service/15/category/9334/detail/38911), [카카오톡 채널](https://cs.daum.net/faq/service/15/category/9334/detail/34269), [카카오맵](https://cs.daum.net/faq/service/15/category/9334/detail/38557) | verified | |
 | [Daum 웹마스터도구](https://webmaster.daum.net/) | unverified | 로그인 페이지로 이동 |
@@ -82,3 +87,4 @@
 | [joshbuchea/HEAD](https://github.com/joshbuchea/HEAD) | 표기 없음 | 30,272 | `<head>` 메타 요소 점검 범위 |
 | [aleclindz/seo-skill-bench](https://github.com/aleclindz/seo-skill-bench) | MIT | 48 | 스타 수와 정확도는 다르다는 근거, 결함을 심은 픽스처로 시험하는 방식(이 저장소 `tests/fixtures`) |
 | [every-app/open-seo](https://github.com/every-app/open-seo) | MIT | 26,245 | 키워드·순위 데이터가 필요하면 별도 도구(DataForSEO 등)가 필요하다는 범위 구분 |
+| [ai-robots-txt/ai.robots.txt](https://github.com/ai-robots-txt/ai.robots.txt) | MIT | 4,246 | AI 크롤러 커뮤니티 목록. Grok 관련 `GrokBot`·`xAI-Grok` 항목이 "Unclear"로 표시돼 있음을 확인(공식 근거로 쓰지 않음) |

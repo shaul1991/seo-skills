@@ -1,7 +1,7 @@
 {
   "name": "seo-skills",
   "description": "Google·네이버·Daum·Bing·Brave·Apple·AI 검색·카카오톡·Meta·X SEO Skill 묶음과 단일 페이지 점검 스크립트",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": { "name": "shaul1991" },
   "homepage": "https://github.com/shaul1991/seo-skills",
   "repository": "https://github.com/shaul1991/seo-skills",

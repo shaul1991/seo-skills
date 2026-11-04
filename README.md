@@ -15,7 +15,7 @@ Google·네이버·Daum(카카오)·Bing·Brave·DuckDuckGo·Apple 검색, ChatG
 | [`naver-search`](skills/naver-search/SKILL.md) | 서치어드바이저: Yeti·robots.txt 응답 코드 해석·소유 확인·로봇 메타(`nosourceinfo`)·og:image 조건·RSS/사이트맵 제출·파비콘·스팸 |
 | [`daum-search`](skills/daum-search/SKILL.md) | Daum(카카오): Daum/Daum-Preview 로봇, 검색등록, 웹마스터도구 PIN, 웹문서 미노출 점검, 연관 채널, 카카오톡 채널·카카오맵 |
 | [`other-search-engines`](skills/other-search-engines/SKILL.md) | Bing(Edge·Copilot, 2027 AI 학습·그라운딩 설정), Brave Search(Brave 브라우저), DuckDuckGo, Apple(Safari·Spotlight·Siri) |
-| [`ai-crawlers`](skills/ai-crawlers/SKILL.md) | ChatGPT·Perplexity·Claude·Meta AI·Apple·Google·Bing의 검색용/학습용/사용자 요청 크롤러 정책과 robots.txt 추천안 |
+| [`ai-crawlers`](skills/ai-crawlers/SKILL.md) | **AI 검색 노출 설정**: ChatGPT·Claude·Grok·Gemini·Copilot·Perplexity·Meta AI·Apple·Mistral별 근거 색인과 필요한 robots.txt·WAF/CDN 설정, 학습 차단과의 구분 |
 | [`structured-data`](skills/structured-data/SKILL.md) | JSON-LD 템플릿(Event·WebSite·Organization+sameAs·BreadcrumbList·ItemList)과 Google·네이버 지원 차이 |
 | [`social-preview`](skills/social-preview/SKILL.md) | Open Graph·X 카드·카카오톡(스크랩 서버 IP·캐시 초기화)·Meta(Facebook·Instagram·Threads 크롤러 요구사항)·Daum 미리보기 |
 | [`indexnow`](skills/indexnow/SKILL.md) | 네이버·Bing 등에 변경 URL 알리기(키 파일, GET/POST, 응답 코드) |
@@ -36,6 +36,7 @@ Google·네이버·Daum(카카오)·Bing·Brave·DuckDuckGo·Apple 검색, ChatG
 - **Bing은 2027-02-01부터 `noarchive`·`nocache` 대신 AI 학습(`__usage_ai-training`, `ai-training:disallow`)·그라운딩(`ai-grounding:disallow`) 설정을 따로 읽습니다.** 2027-03-01 이후 옛 태그는 이 용도로 읽지 않습니다(2026-10-30 발표).
 - Daum은 웹문서 수집 `Daum/4.1`(robots 이름 `Daum`), 링크 미리보기 `Daum-Preview/1.0` 두 로봇을 씁니다.
 - Meta 링크 미리보기 크롤러는 og 태그가 응답 **첫 1MB 안**에 있어야 하고 gzip·deflate를 요구합니다.
+- **AI 검색 노출이 기본값입니다.** Claude 웹 검색은 Brave Search를 씁니다(Anthropic 하위 처리자 목록) → Brave 색인(=Googlebot 크롤링 가능)이 Claude 노출 조건. ChatGPT는 `OAI-SearchBot` 허용과 OpenAI IP를 막지 않는 CDN이 포함 조건. Grok은 웹 검색과 X 게시물 검색을 쓰며 xAI는 크롤러 UA를 공개하지 않습니다. `Google-Extended`를 막으면 Gemini 앱 그라운딩에서 빠집니다.
 
 ## 설치
 
@@ -69,7 +70,7 @@ Claude Code 플러그인:
 /seo-orchestrator 이 Next.js 프로젝트를 Google·네이버·카카오톡·X 기준으로 점검하고 고칠 목록을 만들어 줘
 /naver-search robots.txt랑 서치어드바이저 소유 확인이 왜 실패하는지 봐 줘
 /structured-data 행사 상세 페이지에 Event JSON-LD를 넣어 줘. 취소·연기 상태도 처리해 줘
-/ai-crawlers ChatGPT·Perplexity 검색에는 나오고 AI 학습에는 안 쓰이게 robots.txt를 만들어 줘
+/ai-crawlers ChatGPT·Claude·Grok·Gemini 검색에 노출되게 robots.txt와 CDN 설정을 점검해 줘
 /daum-search 다음 검색에 사이트가 안 나오는 이유를 점검해 줘
 /browser-compat Brave에서 분석 수치가 비고 위젯이 안 보이는지 확인해 줘
 /scaled-pages 지역×월 목록 페이지 중 어떤 걸 색인하고 어떤 걸 noindex할지 정해 줘

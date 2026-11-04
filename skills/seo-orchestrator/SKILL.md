@@ -28,7 +28,7 @@ description: >-
 
 질문은 최대 3개. 코드에서 알 수 있는 것은 묻지 않습니다.
 
-1. **대상 채널:** 검색(Google·네이버·Daum·Bing·Brave·Apple), AI 검색(ChatGPT·Perplexity·Claude 등), 공유(카카오톡·X·Meta) 중 무엇이 중요한가. 기본값: 한국 서비스면 Google + 네이버 + Daum + 카카오톡 + X + Meta, AI 검색은 허용·학습은 운영자 결정.
+1. **대상 채널:** 검색(Google·네이버·Daum·Bing·Brave·Apple), AI 검색(ChatGPT·Perplexity·Claude 등), 공유(카카오톡·X·Meta) 중 무엇이 중요한가. 기본값: 한국 서비스면 Google + 네이버 + Daum + 카카오톡 + X + Meta, **AI 검색(ChatGPT·Claude·Grok·Gemini·Copilot·Perplexity) 노출 허용이 기본**, 학습 차단은 운영자 결정.
 2. **사이트 상태:** 아직 코드만 있음 / 배포됨(URL 있음) / Search Console·서치어드바이저 등록됨.
 3. **페이지 유형:** 홈, 목록, 상세(행사·상품·글), 지역·월별 모음 등. 대량 생성 페이지가 있으면 `scaled-pages`를 반드시 포함.
 
@@ -40,7 +40,7 @@ description: >-
    → `google-search` §제목·스니펫, `naver-search` §콘텐츠 마크업, `social-preview`.
 3. **구조화 데이터:** 페이지 유형에 맞는 JSON-LD. 보이는 본문과 일치하는 값만.
    → `structured-data`.
-4. **AI 크롤러 정책:** 검색·인용 허용과 학습 허용을 따로 결정하고 robots.txt·메타에 반영.
+4. **AI 검색 노출(기본 적용):** AI 검색·사용자 요청 크롤러 허용, WAF·CDN이 그 IP를 막지 않음, Claude용 Brave 색인·Grok용 X 게시물 확인. 학습 차단은 따로 결정하되 `Google-Extended`·`ai-grounding`은 노출과 충돌함을 알림.
    → `ai-crawlers`.
 5. **대량 페이지 품질:** 조합 페이지가 있다면 색인 대상 기준과 noindex 기준.
    → `scaled-pages`.

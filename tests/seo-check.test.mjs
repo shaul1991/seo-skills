@@ -38,6 +38,10 @@ test("robots.txt specificity and Applebot fallback", () => {
   const ai = "User-agent: Applebot-Extended\nDisallow: /\n\nUser-agent: *\nAllow: /\n";
   assert.equal(robotsBlocksRoot(ai, "Applebot-Extended"), true);
   assert.equal(robotsBlocksRoot(ai, "Applebot"), false, "Applebot-Extended group must not apply to Applebot");
+  const tr = "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nAllow: /\n";
+  assert.equal(robotsBlocksRoot(tr, "GPTBot"), true);
+  assert.equal(robotsBlocksRoot(tr, "OAI-SearchBot"), false, "blocking GPTBot must not block OAI-SearchBot");
+  assert.equal(robotsBlocksRoot(tr, "ChatGPT-User"), false);
   const ms = "User-Agent: __usage_ai-training\nDisallow: /\n";
   assert.equal(robotsBlocksRoot(ms, "__usage_ai-training"), true);
 });

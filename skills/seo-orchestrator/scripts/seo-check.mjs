@@ -243,6 +243,8 @@ export function checkPage(p, add, baseUrl) {
   if (/nosourceinfo/i.test(robots)) add("INFO", "네이버", "nosourceinfo", "네이버 AI 출처설명 제외 설정됨", "naver-search");
   if (/\b(noarchive|nocache)\b/i.test(robots)) add("WARN", "Bing", "noarchive/nocache", "Bing은 2027-03-01 이후 이 태그를 AI 학습·그라운딩 설정으로 읽지 않음 — ai-training/ai-grounding 설정으로 옮길지 결정", "other-search-engines");
   if (/ai-(training|grounding)/i.test(robots)) add("INFO", "Bing", "AI 설정", robots.match(/ai-(training|grounding):[a-z]+/gi).join(", "), "ai-crawlers");
+  if (/ai-grounding:disallow/i.test(robots)) add("WARN", "AI 검색", "ai-grounding", "Copilot 등 Bing AI 답변 근거에서 제외됨", "ai-crawlers");
+  if (/nosourceinfo/i.test(robots)) add("WARN", "AI 검색", "nosourceinfo", "네이버 AI 출처설명에서 제외됨", "ai-crawlers");
   if (p.meta["applebot"] || /nosnippet/i.test(robots)) add("INFO", "공통", "nosnippet", "Google·Apple 등에서 설명·AI 답변 사용이 제한될 수 있음", "ai-crawlers");
   // 기본
   if (!p.lang) add("WARN", "공통", "<html lang>", "없음", "google-search");
@@ -302,14 +304,20 @@ export const ROBOT_AGENTS = [
   ["Twitterbot", "FAIL", "social-preview", "X 카드"],
   ["facebookexternalhit", "FAIL", "social-preview", "Meta 링크 미리보기"],
   ["OAI-SearchBot", "WARN", "ai-crawlers", "ChatGPT 검색 답변에서 빠짐"],
-  ["PerplexityBot", "WARN", "ai-crawlers", "Perplexity 검색에서 빠짐"],
+  ["ChatGPT-User", "WARN", "ai-crawlers", "ChatGPT 사용자 요청 열람 불가"],
   ["Claude-SearchBot", "WARN", "ai-crawlers", "Claude 검색 품질용 색인에서 빠짐"],
+  ["Claude-User", "WARN", "ai-crawlers", "Claude 사용자 요청 열람 불가"],
+  ["PerplexityBot", "WARN", "ai-crawlers", "Perplexity 검색에서 빠짐"],
+  ["Perplexity-User", "WARN", "ai-crawlers", "Perplexity 사용자 요청(대체로 robots 무시)"],
   ["meta-webindexer", "WARN", "ai-crawlers", "Meta AI 검색 인용에서 빠짐"],
+  ["MistralAI-Index", "WARN", "ai-crawlers", "Mistral 검색에서 빠짐"],
+  ["MistralAI-User", "WARN", "ai-crawlers", "Mistral 사용자 요청 열람 불가"],
+  ["Google-Extended", "WARN", "ai-crawlers", "Gemini 앱·Vertex AI의 Google 검색 그라운딩에서 빠짐(Google 검색 자체엔 영향 없음)"],
   ["GPTBot", "INFO", "ai-crawlers", "OpenAI 학습 제외"],
   ["ClaudeBot", "INFO", "ai-crawlers", "Anthropic 학습 제외"],
-  ["Google-Extended", "INFO", "ai-crawlers", "Google 기타 AI 학습·그라운딩 제외"],
   ["Applebot-Extended", "INFO", "ai-crawlers", "Apple 생성형 모델 학습 제외"],
   ["meta-externalagent", "INFO", "ai-crawlers", "Meta 학습 제외"],
+  ["MistralAI-Training", "INFO", "ai-crawlers", "Mistral 학습 제외"],
   ["__usage_ai-training", "INFO", "ai-crawlers", "Microsoft AI 학습 제외(2027-02-01부터 반영)"],
 ];
 
@@ -321,9 +329,14 @@ async function checkRobots(origin, add) {
     if (res.status >= 500) return add("FAIL", "공통", "robots.txt", `HTTP ${res.status} — 네이버는 5xx를 '모두 금지'로 해석`, "naver-search");
     if (res.status >= 400) return add("INFO", "공통", "robots.txt", `HTTP ${res.status} — 없음(모두 허용으로 해석)`, "naver-search");
     if (/text\/html/i.test(ct)) add("WARN", "공통", "robots.txt", "HTML로 응답 — 네이버는 '없음'으로 볼 수 있음. text/plain 권장", "naver-search");
+    const blockedAi = [];
     for (const [agent, level, skill, note] of ROBOT_AGENTS) {
-      if (robotsBlocksRoot(txt, agent)) add(level, level === "INFO" ? "AI 학습" : "공통", `robots.txt ${agent}`, `사이트 전체 차단${note ? ` — ${note}` : ""}`, skill);
+      if (!robotsBlocksRoot(txt, agent)) continue;
+      const channel = level === "INFO" ? "AI 학습" : skill === "ai-crawlers" ? "AI 검색" : "공통";
+      if (channel === "AI 검색") blockedAi.push(agent);
+      add(level, channel, `robots.txt ${agent}`, `사이트 전체 차단${note ? ` — ${note}` : ""}`, skill);
     }
+    if (!blockedAi.length) add("INFO", "AI 검색", "robots.txt", "AI 검색·사용자 요청 크롤러 차단 없음(Grok은 공개 UA가 없어 * 규칙 기준). WAF·CDN 봇 차단은 별도 확인", "ai-crawlers");
     const sitemaps = txt.split(/\r?\n/).filter((l) => /^\s*sitemap\s*:/i.test(l)).map((l) => l.split(/:(.+)/)[1].trim());
     add(sitemaps.length ? "INFO" : "WARN", "공통", "robots.txt Sitemap", sitemaps.length ? sitemaps.join(", ") : "Sitemap: 줄 없음", "google-search");
   } catch (e) { add("WARN", "공통", "robots.txt", `가져오기 실패: ${String(e.message).slice(0, 80)}`, "google-search"); }
