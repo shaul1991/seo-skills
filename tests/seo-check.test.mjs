@@ -57,6 +57,15 @@ test("Bing noarchive transition warning", async () => {
   assert.ok(r.results.some((x) => x.item === "AI 설정" && /ai-training:disallow/.test(x.detail)));
 });
 
+test("robotsDecision reports where the rule came from", async () => {
+  const { robotsDecision } = await import("../skills/seo-orchestrator/scripts/seo-check.mjs");
+  const preview = "User-Agent: *\nDisallow: /\n";
+  assert.deepEqual(robotsDecision(preview, "OAI-SearchBot"), { blocked: true, via: "*" });
+  assert.deepEqual(robotsDecision("User-agent: Googlebot\nDisallow: /\n", "Applebot"), { blocked: true, via: "fallback" });
+  assert.deepEqual(robotsDecision("User-agent: GPTBot\nDisallow: /\n", "GPTBot"), { blocked: true, via: "own" });
+  assert.deepEqual(robotsDecision("", "GPTBot"), { blocked: false, via: null });
+});
+
 test("image size parsing", () => {
   const png = Buffer.alloc(33); png.writeUInt32BE(0x89504e47, 0); png.writeUInt32BE(1200, 16); png.writeUInt32BE(630, 20);
   assert.deepEqual(imageSize(png), { type: "png", w: 1200, h: 630 });

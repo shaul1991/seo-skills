@@ -198,14 +198,21 @@ function pickGroup(groups, agent) {
 
 const FALLBACK = { applebot: "googlebot" }; // Applebot 문서: Applebot 규칙이 없으면 Googlebot 규칙을 따름
 
-export function robotsBlocksRoot(txt, agent) {
+const blocksRoot = (g) => g.rules.some((r) => r.type === "disallow" && r.path === "/") && !g.rules.some((r) => r.type === "allow" && (r.path === "/" || r.path === "/$"));
+
+// { blocked, via }: via = "own"(자기 그룹) | "fallback"(예: Applebot→Googlebot) | "*" | null
+export function robotsDecision(txt, agent) {
   const groups = robotsGroups(txt);
   const a = agent.toLowerCase();
-  const g = pickGroup(groups, a) || (FALLBACK[a] && pickGroup(groups, FALLBACK[a])) || groups.find((x) => x.agents.includes("*"));
-  if (!g) return false;
-  const disallowAll = g.rules.some((r) => r.type === "disallow" && r.path === "/");
-  const allowRoot = g.rules.some((r) => r.type === "allow" && (r.path === "/" || r.path === "/$"));
-  return disallowAll && !allowRoot;
+  let g = pickGroup(groups, a), via = "own";
+  if (!g && FALLBACK[a]) { g = pickGroup(groups, FALLBACK[a]); via = "fallback"; }
+  if (!g) { g = groups.find((x) => x.agents.includes("*")); via = "*"; }
+  if (!g) return { blocked: false, via: null };
+  return { blocked: blocksRoot(g), via };
+}
+
+export function robotsBlocksRoot(txt, agent) {
+  return robotsDecision(txt, agent).blocked;
 }
 
 // ---------- 메인 점검 ----------
@@ -238,7 +245,7 @@ export function checkPage(p, add, baseUrl) {
   }
   // robots meta
   const robots = [p.meta["robots"], p.meta["googlebot"], p.meta["yeti"], p.meta["bingbot"], p.meta["applebot"]].filter(Boolean).join(", ");
-  if (/noindex/i.test(robots)) add("WARN", "공통", "robots meta", `noindex 있음: ${robots}`, "google-search");
+  if (/noindex/i.test(robots)) add("WARN", "공통", "robots meta", `noindex 있음: ${robots} — 의도한 비공개·미리보기가 아니면 제거`, "google-search");
   else if (robots) add("INFO", "공통", "robots meta", robots, "google-search");
   if (/nosourceinfo/i.test(robots)) add("INFO", "네이버", "nosourceinfo", "네이버 AI 출처설명 제외 설정됨", "naver-search");
   if (/\b(noarchive|nocache)\b/i.test(robots)) add("WARN", "Bing", "noarchive/nocache", "Bing은 2027-03-01 이후 이 태그를 AI 학습·그라운딩 설정으로 읽지 않음 — ai-training/ai-grounding 설정으로 옮길지 결정", "other-search-engines");
@@ -321,7 +328,7 @@ export const ROBOT_AGENTS = [
   ["__usage_ai-training", "INFO", "ai-crawlers", "Microsoft AI 학습 제외(2027-02-01부터 반영)"],
 ];
 
-async function checkRobots(origin, add) {
+async function checkRobots(origin, add, pageNoindex = false) {
   try {
     const res = await fetch(`${origin}/robots.txt`, { headers: { "user-agent": UA } });
     const ct = res.headers.get("content-type") || "";
@@ -330,13 +337,22 @@ async function checkRobots(origin, add) {
     if (res.status >= 400) return add("INFO", "공통", "robots.txt", `HTTP ${res.status} — 없음(모두 허용으로 해석)`, "naver-search");
     if (/text\/html/i.test(ct)) add("WARN", "공통", "robots.txt", "HTML로 응답 — 네이버는 '없음'으로 볼 수 있음. text/plain 권장", "naver-search");
     const blockedAi = [];
+    const viaStar = [];
     for (const [agent, level, skill, note] of ROBOT_AGENTS) {
-      if (!robotsBlocksRoot(txt, agent)) continue;
+      const d = robotsDecision(txt, agent);
+      if (!d.blocked) continue;
+      // `User-agent: *` 전체 차단 때문에 막힌 봇은 한 줄로 묶는다(미리보기·비공개 사이트에서 봇별 경고가 쏟아지지 않게).
+      if (d.via === "*") { viaStar.push(agent); continue; }
       const channel = level === "INFO" ? "AI 학습" : skill === "ai-crawlers" ? "AI 검색" : "공통";
       if (channel === "AI 검색") blockedAi.push(agent);
       add(level, channel, `robots.txt ${agent}`, `사이트 전체 차단${note ? ` — ${note}` : ""}`, skill);
     }
-    if (!blockedAi.length) add("INFO", "AI 검색", "robots.txt", "AI 검색·사용자 요청 크롤러 차단 없음(Grok은 공개 UA가 없어 * 규칙 기준). WAF·CDN 봇 차단은 별도 확인", "ai-crawlers");
+    if (viaStar.length) {
+      const msg = `User-agent: * 로 사이트 전체 차단 — 검색·공유·AI 검색 크롤러(학습용 포함) ${viaStar.length}종이 막힘(${viaStar.join(", ")}). Grok처럼 UA를 공개하지 않는 봇도 막힘`;
+      if (pageNoindex) add("INFO", "공통", "비공개 상태", `${msg}. 페이지도 noindex라 공개 전 미리보기로 보임 — 운영 공개 시 다시 점검`, "seo-orchestrator");
+      else add("FAIL", "공통", "robots.txt *", msg, "google-search");
+    }
+    if (!blockedAi.length && !viaStar.length) add("INFO", "AI 검색", "robots.txt", "AI 검색·사용자 요청 크롤러 차단 없음(Grok은 공개 UA가 없어 * 규칙 기준). WAF·CDN 봇 차단은 별도 확인", "ai-crawlers");
     const sitemaps = txt.split(/\r?\n/).filter((l) => /^\s*sitemap\s*:/i.test(l)).map((l) => l.split(/:(.+)/)[1].trim());
     add(sitemaps.length ? "INFO" : "WARN", "공통", "robots.txt Sitemap", sitemaps.length ? sitemaps.join(", ") : "Sitemap: 줄 없음", "google-search");
   } catch (e) { add("WARN", "공통", "robots.txt", `가져오기 실패: ${String(e.message).slice(0, 80)}`, "google-search"); }
@@ -362,7 +378,8 @@ export async function run(target) {
     const { ogImage } = checkPage(p, add, baseUrl);
     checkJsonLd(p.jsonLd, add);
     if (ogImage && /^https?:/i.test(ogImage)) await checkImage(ogImage, add);
-    await checkRobots(new URL(baseUrl).origin, add);
+    const pageNoindex = /noindex/i.test([p.meta["robots"], p.meta["googlebot"]].filter(Boolean).join(","));
+    await checkRobots(new URL(baseUrl).origin, add, pageNoindex);
   } else {
     html = await readFile(target, "utf8");
     const p = parseHtml(html);

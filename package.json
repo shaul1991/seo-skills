@@ -1,6 +1,6 @@
 {
   "name": "seo-skills",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "description": "Google·네이버·X·카카오톡 SEO Skill 묶음과 점검 스크립트",
   "type": "module",
