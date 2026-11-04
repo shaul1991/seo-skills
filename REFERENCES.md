@@ -3,7 +3,7 @@
 이 저장소의 Skill은 아래 공식 문서를 읽고 **직접 요약·재구성**한 것입니다. 공식 문서 본문을 복제하지 않았으며 각 문서의 저작권은 해당 소유자(Google, NAVER Corp., X Corp., Kakao Corp., Meta, IndexNow.org)에 있습니다. 이 저장소는 이들 회사와 관련이 없습니다.
 
 - 확인 방법: ego-lite 브라우저로 원문을 열어 본문 텍스트를 읽음.
-- 확인 시각: 2026-11-04 08:38~08:45 KST (2026-11-03T23:38~23:45Z).
+- 확인 시각: 1차 2026-11-04 08:38~08:45 KST (2026-11-03T23:38~23:45Z), 2차(Daum·Bing·Brave·DuckDuckGo·Apple·AI 크롤러·Meta·브라우저) 2026-11-04 09:0x~09:2x KST.
 - 상태: `verified` = 이번에 원문 확인, `historical` = 현재 원문이 없어 보관본 사용, `unverified` = 접근 실패·로그인 필요.
 
 ## 공식 문서
@@ -52,7 +52,20 @@
 | [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing) | unverified | 카카오 로그인 필요 |
 | [IndexNow 문서](https://www.indexnow.org/documentation), [FAQ](https://www.indexnow.org/faq) | verified | |
 | X 카드: [Summary with large image (2026-02-04 보관본)](https://web.archive.org/web/20260204074639/https://developer.x.com/en/docs/x-for-websites/cards/overview/summary-card-with-large-image), [Troubleshooting (2026-01-24 보관본)](https://web.archive.org/web/20260124210156/https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards) | historical | 원래 주소는 docs.x.com 개요로 이동, docs.x.com 사이트맵에 카드 문서 없음(2026-11-04) |
-| [Bing 웹마스터 가이드라인](https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a) | unverified | 본문 로딩 실패 |
+| [Meta 웹 크롤러](https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers) | verified | 2026-05-21 갱신 표기, 한국어 AI 번역본 |
+| [카카오 방화벽 참고 정보](https://developers.kakao.com/docs/ko/reference/firewall) | verified | 스크랩 메시지 IP |
+| [카카오 기술지원 블로그: OG 캐시 삭제(2022-08)](https://kakao-tam.tistory.com/137) | historical | 공유 디버거 캐시 초기화 동작 |
+| [카카오 데브톡: og:image 변경 미반영(2026-09)](https://devtalk.kakao.com/t/og-image/151809) | verified(사용자 글) | `kakaotalk-scrap` UA 관찰 |
+| [Bing 웹마스터 가이드라인](https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a) | unverified | 본문 로딩 실패(두 번 시도) |
+| [How to Verify Bingbot](https://www.bing.com/webmasters/help/how-to-verify-bingbot-3905dc26), [Bing 지원 robots 메타](https://www.bing.com/webmasters/help/robots-meta-tags-and-attributes-that-bing-supports-5198d240) | verified | |
+| [Bing 블로그: 학습·그라운딩 설정(2026-10-30)](https://blogs.bing.com/search/2026/10/your-content-your-choice-clearer-preferences-for-training-and-grounding/), [AI Performance(2026-02-10)](https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/) | verified | |
+| [Brave Search Crawler](https://search.brave.com/help/brave-search-crawler), [Submit URL](https://search.brave.com/submit-url), [Google fallback](https://search.brave.com/help/google-fallback), [Featured snippets](https://search.brave.com/help/featured-snippets), [AI](https://search.brave.com/help/ai) | verified | |
+| [Brave Web Discovery Project](https://support.brave.app/hc/en-us/articles/4409406835469-What-is-the-Web-Discovery-Project), [Shields](https://support.brave.app/hc/en-us/articles/360022973471-What-is-Shields), [De-AMP](https://support.brave.app/hc/en-us/articles/8611298579981-What-is-Brave-s-De-AMP-feature) | verified | |
+| [DuckDuckGo 결과 출처](https://duckduckgo.com/duckduckgo-help-pages/results/sources), [DuckDuckBot](https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot) | verified | |
+| [Applebot에 관하여](https://support.apple.com/ko-kr/119829) | verified | |
+| [OpenAI 크롤러](https://developers.openai.com/api/docs/bots), [Perplexity 크롤러](https://docs.perplexity.ai/docs/resources/perplexity-crawlers), [Anthropic 크롤러(2026-04-08)](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler) | verified | |
+| [MDN theme-color](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/theme-color), [MDN Web app manifest](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest) | verified | |
+| Daum 검색 도움말: [웹문서 검색이란(로봇 안내)](https://cs.daum.net/faq/service/15/category/4118/detail/28961), [웹문서 노출](https://cs.daum.net/faq/service/15/category/4118/detail/28967), [웹마스터도구 PIN](https://cs.daum.net/faq/service/15/category/4118/detail/38321), [검색등록 목록](https://cs.daum.net/faq/service/15/category/9334), [연관 채널](https://cs.daum.net/faq/service/15/category/9334/detail/38911), [카카오톡 채널](https://cs.daum.net/faq/service/15/category/9334/detail/34269), [카카오맵](https://cs.daum.net/faq/service/15/category/9334/detail/38557) | verified | |
 | [Daum 웹마스터도구](https://webmaster.daum.net/) | unverified | 로그인 페이지로 이동 |
 
 ## 참고한 GitHub 저장소

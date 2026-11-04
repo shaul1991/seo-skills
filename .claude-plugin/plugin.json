@@ -1,11 +1,11 @@
 {
   "name": "seo-skills",
-  "description": "Google·네이버·X·카카오톡·Open Graph·IndexNow SEO Skill 묶음과 단일 페이지 점검 스크립트",
-  "version": "0.1.0",
+  "description": "Google·네이버·Daum·Bing·Brave·Apple·AI 검색·카카오톡·Meta·X SEO Skill 묶음과 단일 페이지 점검 스크립트",
+  "version": "0.2.0",
   "author": { "name": "shaul1991" },
   "homepage": "https://github.com/shaul1991/seo-skills",
   "repository": "https://github.com/shaul1991/seo-skills",
   "license": "MIT",
-  "keywords": ["seo", "naver", "google", "open-graph", "twitter-card", "kakao", "indexnow", "structured-data"],
+  "keywords": ["seo", "naver", "google", "daum", "bing", "brave", "applebot", "ai-crawlers", "open-graph", "twitter-card", "kakao", "indexnow", "structured-data"],
   "skills": "./skills"
 }

@@ -31,6 +31,28 @@ test("robots.txt group matching", () => {
   assert.equal(robotsBlocksRoot("User-agent: *\nDisallow: /admin/\n", "Twitterbot"), false);
 });
 
+test("robots.txt specificity and Applebot fallback", () => {
+  const txt = "User-agent: Googlebot\nDisallow: /\n\nUser-agent: *\nAllow: /\n";
+  assert.equal(robotsBlocksRoot(txt, "Applebot"), true, "Applebot follows Googlebot when no Applebot group");
+  assert.equal(robotsBlocksRoot(txt + "\nUser-agent: Applebot\nAllow: /\n", "Applebot"), false);
+  const ai = "User-agent: Applebot-Extended\nDisallow: /\n\nUser-agent: *\nAllow: /\n";
+  assert.equal(robotsBlocksRoot(ai, "Applebot-Extended"), true);
+  assert.equal(robotsBlocksRoot(ai, "Applebot"), false, "Applebot-Extended group must not apply to Applebot");
+  const ms = "User-Agent: __usage_ai-training\nDisallow: /\n";
+  assert.equal(robotsBlocksRoot(ms, "__usage_ai-training"), true);
+});
+
+test("Bing noarchive transition warning", async () => {
+  const { writeFile, mkdtemp } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const dir = await mkdtemp(`${tmpdir()}/seo-`);
+  const f = `${dir}/p.html`;
+  await writeFile(f, '<html lang="ko"><head><title>t</title><meta name="robots" content="noarchive"><meta name="Bingbot" content="ai-training:disallow"></head><body></body></html>');
+  const r = await run(f);
+  assert.ok(has(r, "WARN", "noarchive/nocache"));
+  assert.ok(r.results.some((x) => x.item === "AI 설정" && /ai-training:disallow/.test(x.detail)));
+});
+
 test("image size parsing", () => {
   const png = Buffer.alloc(33); png.writeUInt32BE(0x89504e47, 0); png.writeUInt32BE(1200, 16); png.writeUInt32BE(630, 20);
   assert.deepEqual(imageSize(png), { type: "png", w: 1200, h: 630 });

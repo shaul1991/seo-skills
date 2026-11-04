@@ -159,7 +159,7 @@ async function fetchFollow(url, max = 5) {
   const chain = [];
   let cur = url;
   for (let i = 0; i <= max; i++) {
-    const res = await fetch(cur, { redirect: "manual", headers: { "user-agent": UA, accept: "text/html,*/*" } });
+    const res = await fetch(cur, { redirect: "manual", headers: { "user-agent": UA, accept: "text/html,*/*", "accept-encoding": "gzip, deflate" } });
     chain.push({ url: cur, status: res.status });
     const loc = res.headers.get("location");
     if (res.status >= 300 && res.status < 400 && loc) { cur = new URL(loc, cur).href; continue; }
@@ -185,10 +185,23 @@ function robotsGroups(txt) {
   return groups;
 }
 
+// 가장 구체적인(긴) 이름의 그룹을 고르고, 없으면 fallback 에이전트(예: Applebot→Googlebot), 그다음 *.
+function pickGroup(groups, agent) {
+  const a = agent.toLowerCase();
+  let best = null, bestLen = -1;
+  for (const g of groups) for (const n of g.agents) {
+    if (n === "*") continue;
+    if ((a === n || a.startsWith(n)) && n.length > bestLen) { best = g; bestLen = n.length; }
+  }
+  return best;
+}
+
+const FALLBACK = { applebot: "googlebot" }; // Applebot 문서: Applebot 규칙이 없으면 Googlebot 규칙을 따름
+
 export function robotsBlocksRoot(txt, agent) {
   const groups = robotsGroups(txt);
   const a = agent.toLowerCase();
-  const g = groups.find((x) => x.agents.some((n) => n !== "*" && a.includes(n))) || groups.find((x) => x.agents.includes("*"));
+  const g = pickGroup(groups, a) || (FALLBACK[a] && pickGroup(groups, FALLBACK[a])) || groups.find((x) => x.agents.includes("*"));
   if (!g) return false;
   const disallowAll = g.rules.some((r) => r.type === "disallow" && r.path === "/");
   const allowRoot = g.rules.some((r) => r.type === "allow" && (r.path === "/" || r.path === "/$"));
@@ -224,10 +237,13 @@ export function checkPage(p, add, baseUrl) {
     if (baseUrl && abs(p.canonical) && new URL(p.canonical).href !== new URL(baseUrl).href) add("INFO", "공통", "canonical", `다른 URL을 가리킴: ${p.canonical}`, "google-search");
   }
   // robots meta
-  const robots = [p.meta["robots"], p.meta["googlebot"], p.meta["yeti"]].filter(Boolean).join(", ");
+  const robots = [p.meta["robots"], p.meta["googlebot"], p.meta["yeti"], p.meta["bingbot"], p.meta["applebot"]].filter(Boolean).join(", ");
   if (/noindex/i.test(robots)) add("WARN", "공통", "robots meta", `noindex 있음: ${robots}`, "google-search");
   else if (robots) add("INFO", "공통", "robots meta", robots, "google-search");
   if (/nosourceinfo/i.test(robots)) add("INFO", "네이버", "nosourceinfo", "네이버 AI 출처설명 제외 설정됨", "naver-search");
+  if (/\b(noarchive|nocache)\b/i.test(robots)) add("WARN", "Bing", "noarchive/nocache", "Bing은 2027-03-01 이후 이 태그를 AI 학습·그라운딩 설정으로 읽지 않음 — ai-training/ai-grounding 설정으로 옮길지 결정", "other-search-engines");
+  if (/ai-(training|grounding)/i.test(robots)) add("INFO", "Bing", "AI 설정", robots.match(/ai-(training|grounding):[a-z]+/gi).join(", "), "ai-crawlers");
+  if (p.meta["applebot"] || /nosnippet/i.test(robots)) add("INFO", "공통", "nosnippet", "Google·Apple 등에서 설명·AI 답변 사용이 제한될 수 있음", "ai-crawlers");
   // 기본
   if (!p.lang) add("WARN", "공통", "<html lang>", "없음", "google-search");
   if (!p.meta["viewport"]) add("WARN", "공통", "viewport", "없음(모바일)", "naver-search");
@@ -275,6 +291,28 @@ async function checkImage(url, add) {
   } catch (e) { add("FAIL", "공유", "og:image 응답", String(e.message).slice(0, 100), "social-preview"); }
 }
 
+// [robots.txt 이름, 차단 시 수준, Skill, 설명]
+export const ROBOT_AGENTS = [
+  ["Googlebot", "FAIL", "google-search", "Brave Search·Applebot도 Googlebot 규칙에 영향받음"],
+  ["Yeti", "FAIL", "naver-search", ""],
+  ["Daum", "FAIL", "daum-search", ""],
+  ["Bingbot", "FAIL", "other-search-engines", "DuckDuckGo 일반 결과도 대부분 Bing 기반"],
+  ["Applebot", "WARN", "other-search-engines", "Safari·Spotlight·Siri"],
+  ["DuckDuckBot", "WARN", "other-search-engines", ""],
+  ["Twitterbot", "FAIL", "social-preview", "X 카드"],
+  ["facebookexternalhit", "FAIL", "social-preview", "Meta 링크 미리보기"],
+  ["OAI-SearchBot", "WARN", "ai-crawlers", "ChatGPT 검색 답변에서 빠짐"],
+  ["PerplexityBot", "WARN", "ai-crawlers", "Perplexity 검색에서 빠짐"],
+  ["Claude-SearchBot", "WARN", "ai-crawlers", "Claude 검색 품질용 색인에서 빠짐"],
+  ["meta-webindexer", "WARN", "ai-crawlers", "Meta AI 검색 인용에서 빠짐"],
+  ["GPTBot", "INFO", "ai-crawlers", "OpenAI 학습 제외"],
+  ["ClaudeBot", "INFO", "ai-crawlers", "Anthropic 학습 제외"],
+  ["Google-Extended", "INFO", "ai-crawlers", "Google 기타 AI 학습·그라운딩 제외"],
+  ["Applebot-Extended", "INFO", "ai-crawlers", "Apple 생성형 모델 학습 제외"],
+  ["meta-externalagent", "INFO", "ai-crawlers", "Meta 학습 제외"],
+  ["__usage_ai-training", "INFO", "ai-crawlers", "Microsoft AI 학습 제외(2027-02-01부터 반영)"],
+];
+
 async function checkRobots(origin, add) {
   try {
     const res = await fetch(`${origin}/robots.txt`, { headers: { "user-agent": UA } });
@@ -283,8 +321,8 @@ async function checkRobots(origin, add) {
     if (res.status >= 500) return add("FAIL", "공통", "robots.txt", `HTTP ${res.status} — 네이버는 5xx를 '모두 금지'로 해석`, "naver-search");
     if (res.status >= 400) return add("INFO", "공통", "robots.txt", `HTTP ${res.status} — 없음(모두 허용으로 해석)`, "naver-search");
     if (/text\/html/i.test(ct)) add("WARN", "공통", "robots.txt", "HTML로 응답 — 네이버는 '없음'으로 볼 수 있음. text/plain 권장", "naver-search");
-    for (const agent of ["Googlebot", "Yeti", "Twitterbot", "facebookexternalhit"]) {
-      if (robotsBlocksRoot(txt, agent)) add("FAIL", "공통", `robots.txt ${agent}`, "사이트 전체 차단", agent === "Yeti" ? "naver-search" : agent === "Googlebot" ? "google-search" : "social-preview");
+    for (const [agent, level, skill, note] of ROBOT_AGENTS) {
+      if (robotsBlocksRoot(txt, agent)) add(level, level === "INFO" ? "AI 학습" : "공통", `robots.txt ${agent}`, `사이트 전체 차단${note ? ` — ${note}` : ""}`, skill);
     }
     const sitemaps = txt.split(/\r?\n/).filter((l) => /^\s*sitemap\s*:/i.test(l)).map((l) => l.split(/:(.+)/)[1].trim());
     add(sitemaps.length ? "INFO" : "WARN", "공통", "robots.txt Sitemap", sitemaps.length ? sitemaps.join(", ") : "Sitemap: 줄 없음", "google-search");
@@ -302,6 +340,10 @@ export async function run(target) {
     if (chain.some((c) => c.status === 302 || c.status === 307)) add("INFO", "공통", "리다이렉트", "임시 리다이렉트(302/307) 포함 — 영구 이전이면 301", "naver-search");
     if (res.status !== 200) add(res.status >= 400 ? "FAIL" : "WARN", "공통", "HTTP 상태", `${res.status}`, "naver-search");
     html = await res.text();
+    const enc = res.headers.get("content-encoding") || "";
+    if (!/gzip|deflate|br/i.test(enc)) add("INFO", "공유", "압축", "HTML 응답에 gzip/deflate 없음 — Meta 크롤러는 gzip·deflate 지원 요구", "social-preview");
+    const lastOg = Math.max(...[...html.matchAll(/<meta\b[^>]*property\s*=\s*["']og:/gi)].map((m) => Buffer.byteLength(html.slice(0, m.index))), -1);
+    if (lastOg > 1024 * 1024) add("WARN", "공유", "og 위치", `og 태그가 HTML ${Math.round(lastOg / 1024)}KB 지점 — Meta는 첫 1MB만 읽음`, "social-preview");
     if (/http-equiv\s*=\s*["']?refresh/i.test(html)) add("WARN", "네이버", "meta refresh", "있음 — 네이버 소유 확인·수집에서 해석하지 않음. HTTP 리다이렉트 사용", "naver-search");
     const p = parseHtml(html);
     const { ogImage } = checkPage(p, add, baseUrl);

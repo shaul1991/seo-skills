@@ -1,10 +1,10 @@
 ---
 name: seo-orchestrator
 description: >-
-  여러 검색·공유 채널(Google, 네이버, X/Twitter, 카카오톡, Facebook/Threads, Bing 등)을 한 번에 맞추는 SEO 작업의 시작점.
-  대상 채널을 정하고 이 저장소의 하위 Skill(google-search, naver-search, structured-data, social-preview, indexnow, scaled-pages)을
-  순서대로 조합해 점검·구현·보고한다. "SEO 해줘", "검색 노출 점검", "구글이랑 네이버 둘 다", "SEO audit", "launch SEO checklist"
-  같은 요청에 사용. Entry point that combines Google, Naver, social preview, structured data, IndexNow and scaled-page skills.
+  여러 검색·공유·AI 채널(Google, 네이버, Daum/카카오, Bing, Brave, DuckDuckGo, Apple, X, 카카오톡, Meta, ChatGPT·Perplexity·Claude 검색)을
+  한 번에 맞추는 SEO 작업의 시작점. 대상 채널을 정하고 하위 Skill(google-search, naver-search, daum-search, other-search-engines,
+  ai-crawlers, structured-data, social-preview, indexnow, scaled-pages, browser-compat)을 순서대로 조합해 점검·구현·보고한다. "SEO 해줘", "검색 노출 점검", "구글이랑 네이버 둘 다", "SEO audit", "launch SEO checklist"
+  같은 요청에 사용. Entry point that combines search engine, AI crawler, social preview, structured data and browser skills.
 ---
 
 # SEO 조합 시작점
@@ -16,30 +16,38 @@ description: >-
 | `google-search` | Google 크롤링·색인·제목·스니펫·사이트맵·canonical·사이트 이름·AI 기능·스팸 정책·Search Console |
 | `naver-search` | 네이버 서치어드바이저: Yeti, robots.txt, 소유 확인, 메타·오픈그래프, RSS·사이트맵 제출, 수집 요청, 파비콘, 스팸 |
 | `structured-data` | JSON-LD 템플릿(Event, Organization/sameAs, WebSite, BreadcrumbList)과 Google·네이버 차이 |
-| `social-preview` | Open Graph, X(Twitter) 카드, 카카오톡 공유 미리보기, Facebook·Threads |
+| `daum-search` | Daum(카카오) 검색: Daum/Daum-Preview 로봇, 검색등록, 웹마스터도구 PIN, 연관 채널, 카카오톡 채널·카카오맵 |
+| `other-search-engines` | Bing(Edge·Copilot), Brave Search(Brave 브라우저), DuckDuckGo, Apple(Safari·Spotlight·Siri) |
+| `ai-crawlers` | ChatGPT·Perplexity·Claude·Meta AI·Apple·Google·Bing의 AI 검색·학습 크롤러 정책 |
+| `social-preview` | Open Graph, X(Twitter) 카드, 카카오톡, Meta(Facebook·Instagram·Threads), Daum 미리보기 |
 | `indexnow` | IndexNow로 네이버·Bing 등에 변경 URL 알리기 |
 | `scaled-pages` | 지역·날짜·카테고리 조합 페이지를 대량으로 만들 때의 품질 기준(얇은 페이지·도어웨이 회피) |
+| `browser-compat` | Brave Shields·De-AMP, 파비콘·theme-color·manifest, 브라우저별 표시·측정 |
 
 ## 1. 먼저 정할 것
 
 질문은 최대 3개. 코드에서 알 수 있는 것은 묻지 않습니다.
 
-1. **대상 채널:** 검색(Google·네이버·Bing), 공유(카카오톡·X·Facebook·Threads) 중 무엇이 중요한가. 기본값: 한국 서비스면 Google + 네이버 + 카카오톡 + X.
+1. **대상 채널:** 검색(Google·네이버·Daum·Bing·Brave·Apple), AI 검색(ChatGPT·Perplexity·Claude 등), 공유(카카오톡·X·Meta) 중 무엇이 중요한가. 기본값: 한국 서비스면 Google + 네이버 + Daum + 카카오톡 + X + Meta, AI 검색은 허용·학습은 운영자 결정.
 2. **사이트 상태:** 아직 코드만 있음 / 배포됨(URL 있음) / Search Console·서치어드바이저 등록됨.
 3. **페이지 유형:** 홈, 목록, 상세(행사·상품·글), 지역·월별 모음 등. 대량 생성 페이지가 있으면 `scaled-pages`를 반드시 포함.
 
 ## 2. 조합 순서
 
 1. **크롤링·색인 기반(공통):** robots.txt, HTTP 상태 코드, 리다이렉트, canonical, 서버 HTML에 본문이 있는지, `<a href>` 링크, 사이트맵.
-   → `google-search` §크롤링, `naver-search` §수집 둘 다 적용. 충돌하면 더 엄격한 쪽을 따릅니다(예: 네이버는 JavaScript·meta refresh 리다이렉트를 소유 확인에서 지원하지 않음 → HTTP 301/302 사용).
+   → `google-search` §크롤링, `naver-search` §수집, `daum-search` §로봇, `other-search-engines` 적용. Googlebot 규칙은 Brave·Apple에도 번지므로 특히 조심합니다. 충돌하면 더 엄격한 쪽을 따릅니다(예: 네이버는 JavaScript·meta refresh 리다이렉트를 소유 확인에서 지원하지 않음 → HTTP 301/302 사용).
 2. **페이지 메타:** 고유 `<title>`, `meta description`, `og:*`, `twitter:*`, 파비콘, `html lang`.
    → `google-search` §제목·스니펫, `naver-search` §콘텐츠 마크업, `social-preview`.
 3. **구조화 데이터:** 페이지 유형에 맞는 JSON-LD. 보이는 본문과 일치하는 값만.
    → `structured-data`.
-4. **대량 페이지 품질:** 조합 페이지가 있다면 색인 대상 기준과 noindex 기준.
+4. **AI 크롤러 정책:** 검색·인용 허용과 학습 허용을 따로 결정하고 robots.txt·메타에 반영.
+   → `ai-crawlers`.
+5. **대량 페이지 품질:** 조합 페이지가 있다면 색인 대상 기준과 noindex 기준.
    → `scaled-pages`.
-5. **알리기·측정:** Google Search Console(사이트맵 제출, URL 검사), 네이버 서치어드바이저(소유 확인, 사이트맵·RSS 제출), IndexNow, 공유 디버거.
-   → `google-search` §Search Console, `naver-search` §웹마스터도구, `indexnow`, `social-preview` §캐시.
+6. **알리기·측정:** Google Search Console(사이트맵 제출, URL 검사), 네이버 서치어드바이저(소유 확인, 사이트맵·RSS 제출), IndexNow, 공유 디버거.
+   → `google-search` §Search Console, `naver-search` §웹마스터도구, `daum-search` §검색등록, `other-search-engines` §Bing·Brave, `indexnow`, `social-preview` §캐시.
+7. **브라우저 확인:** 사용자 비중이 큰 브라우저(Brave Shields 포함)에서 주요 흐름·아이콘·측정 확인.
+   → `browser-compat`.
 
 ## 3. 자동 점검 스크립트
 

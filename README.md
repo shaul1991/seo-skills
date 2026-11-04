@@ -1,10 +1,10 @@
 # seo-skills
 
-Google·네이버·X(Twitter)·카카오톡·Open Graph·IndexNow 기준을 한곳에 모아 **조합해서 쓰는** 코딩 에이전트용 SEO Skill 묶음입니다. 한국 서비스처럼 Google과 네이버를 함께 맞추고, 카카오톡·X 공유 미리보기까지 챙겨야 할 때를 위해 만들었습니다.
+Google·네이버·Daum(카카오)·Bing·Brave·DuckDuckGo·Apple 검색, ChatGPT·Perplexity·Claude 같은 AI 검색, 카카오톡·Meta·X 공유 미리보기, 브라우저 대응 기준을 한곳에 모아 **조합해서 쓰는** 코딩 에이전트용 SEO Skill 묶음입니다. 한국 서비스처럼 여러 검색엔진과 메신저 공유를 함께 맞춰야 할 때를 위해 만들었습니다.
 
 - Claude Code, Codex 등 [Agent Skills](https://agentskills.io) 형식을 읽는 에이전트에서 씁니다.
 - 각 규칙은 공식 문서를 2026-11-04에 직접 읽고 요약한 것이며, 절마다 원문 링크가 있습니다. 출처 목록은 [REFERENCES.md](REFERENCES.md).
-- Google, NAVER, X, Kakao, Meta와 관련 없는 비공식 저장소입니다.
+- Google, NAVER, Kakao, Microsoft, Brave, Apple, Meta, X, OpenAI, Perplexity, Anthropic 등과 관련 없는 비공식 저장소입니다.
 
 ## 구성
 
@@ -13,12 +13,16 @@ Google·네이버·X(Twitter)·카카오톡·Open Graph·IndexNow 기준을 한�
 | [`seo-orchestrator`](skills/seo-orchestrator/SKILL.md) | **시작점.** 대상 채널을 정하고 아래 Skill을 순서대로 조합, 보고 형식, 점검 스크립트 |
 | [`google-search`](skills/google-search/SKILL.md) | 크롤링·JS·canonical·사이트맵·제목·스니펫·사이트 이름·AI 개요·스팸 정책·Search Console |
 | [`naver-search`](skills/naver-search/SKILL.md) | 서치어드바이저: Yeti·robots.txt 응답 코드 해석·소유 확인·로봇 메타(`nosourceinfo`)·og:image 조건·RSS/사이트맵 제출·파비콘·스팸 |
+| [`daum-search`](skills/daum-search/SKILL.md) | Daum(카카오): Daum/Daum-Preview 로봇, 검색등록, 웹마스터도구 PIN, 웹문서 미노출 점검, 연관 채널, 카카오톡 채널·카카오맵 |
+| [`other-search-engines`](skills/other-search-engines/SKILL.md) | Bing(Edge·Copilot, 2027 AI 학습·그라운딩 설정), Brave Search(Brave 브라우저), DuckDuckGo, Apple(Safari·Spotlight·Siri) |
+| [`ai-crawlers`](skills/ai-crawlers/SKILL.md) | ChatGPT·Perplexity·Claude·Meta AI·Apple·Google·Bing의 검색용/학습용/사용자 요청 크롤러 정책과 robots.txt 추천안 |
 | [`structured-data`](skills/structured-data/SKILL.md) | JSON-LD 템플릿(Event·WebSite·Organization+sameAs·BreadcrumbList·ItemList)과 Google·네이버 지원 차이 |
-| [`social-preview`](skills/social-preview/SKILL.md) | Open Graph·X 카드·카카오톡·Facebook/Threads 미리보기, 캐시 |
+| [`social-preview`](skills/social-preview/SKILL.md) | Open Graph·X 카드·카카오톡(스크랩 서버 IP·캐시 초기화)·Meta(Facebook·Instagram·Threads 크롤러 요구사항)·Daum 미리보기 |
 | [`indexnow`](skills/indexnow/SKILL.md) | 네이버·Bing 등에 변경 URL 알리기(키 파일, GET/POST, 응답 코드) |
 | [`scaled-pages`](skills/scaled-pages/SKILL.md) | 지역·월·카테고리 조합 페이지를 대량으로 만들 때 색인·noindex·canonical 기준 |
+| [`browser-compat`](skills/browser-compat/SKILL.md) | Brave Shields·De-AMP, 파비콘·apple-touch-icon·theme-color·manifest, 분석 과소 집계 |
 
-점검 스크립트 [`skills/seo-orchestrator/scripts/seo-check.mjs`](skills/seo-orchestrator/scripts/seo-check.mjs)는 의존성 없는 Node 18+ 스크립트로, 한 페이지의 title·description·canonical·robots·og·twitter·파비콘·JSON-LD와 (URL이면) 리다이렉트·robots.txt·og:image 크기를 확인합니다.
+점검 스크립트 [`skills/seo-orchestrator/scripts/seo-check.mjs`](skills/seo-orchestrator/scripts/seo-check.mjs)는 의존성 없는 Node 18+ 스크립트로, 한 페이지의 title·description·canonical·robots·og·twitter·파비콘·JSON-LD와 (URL이면) 리다이렉트·압축·og 위치·og:image 크기, 그리고 robots.txt에서 검색·공유·AI 크롤러 18종의 차단 여부를 확인합니다.
 
 ### 조사하면서 확인한 것(2026-11-04)
 
@@ -27,6 +31,11 @@ Google·네이버·X(Twitter)·카카오톡·Open Graph·IndexNow 기준을 한�
 - 네이버 og:image가 검색 썸네일이 되려면 150×150 초과, 5,000바이트 이상, 가로:세로 3:1 이하.
 - Google은 AI 개요·AI 모드에 **별도 파일·마크업이 필요 없다**고 밝힙니다. 네이버는 AI 출처설명을 끄는 `nosourceinfo` 로봇 메타를 제공합니다.
 - X 카드 문서는 현재 docs.x.com에서 찾을 수 없어 2026년 초 보관본을 썼습니다(`historical`).
+- **Brave Search 크롤러는 별도 User-Agent가 없고, Googlebot이 못 가는 곳은 가지 않습니다.** Applebot도 Applebot 규칙이 없으면 Googlebot 규칙을 따릅니다 → Googlebot 차단은 Brave·Safari 검색에도 번집니다.
+- DuckDuckGo 일반 결과는 대부분 Bing에서 옵니다.
+- **Bing은 2027-02-01부터 `noarchive`·`nocache` 대신 AI 학습(`__usage_ai-training`, `ai-training:disallow`)·그라운딩(`ai-grounding:disallow`) 설정을 따로 읽습니다.** 2027-03-01 이후 옛 태그는 이 용도로 읽지 않습니다(2026-10-30 발표).
+- Daum은 웹문서 수집 `Daum/4.1`(robots 이름 `Daum`), 링크 미리보기 `Daum-Preview/1.0` 두 로봇을 씁니다.
+- Meta 링크 미리보기 크롤러는 og 태그가 응답 **첫 1MB 안**에 있어야 하고 gzip·deflate를 요구합니다.
 
 ## 설치
 
@@ -60,6 +69,9 @@ Claude Code 플러그인:
 /seo-orchestrator 이 Next.js 프로젝트를 Google·네이버·카카오톡·X 기준으로 점검하고 고칠 목록을 만들어 줘
 /naver-search robots.txt랑 서치어드바이저 소유 확인이 왜 실패하는지 봐 줘
 /structured-data 행사 상세 페이지에 Event JSON-LD를 넣어 줘. 취소·연기 상태도 처리해 줘
+/ai-crawlers ChatGPT·Perplexity 검색에는 나오고 AI 학습에는 안 쓰이게 robots.txt를 만들어 줘
+/daum-search 다음 검색에 사이트가 안 나오는 이유를 점검해 줘
+/browser-compat Brave에서 분석 수치가 비고 위젯이 안 보이는지 확인해 줘
 /scaled-pages 지역×월 목록 페이지 중 어떤 걸 색인하고 어떤 걸 noindex할지 정해 줘
 ```
 
