@@ -118,4 +118,4 @@ The report shows one owned citation in one observed answer. The Unicode domain i
 
 ## Contribute
 
-Regional search guidance, translated examples, and reproducible parser cases are welcome. For a locale-specific CSV issue, include synthetic headers and a representative row. Run `npm test` from the repository root when changing code. [Skill catalog](README.md#구성) · [License](LICENSE)
+Regional search guidance, translated examples, and reproducible parser cases are welcome. For a locale-specific CSV issue, include synthetic headers and a representative row. Run `npm test` from the repository root when changing code. CI checks skill metadata, the orchestrator catalog, documented CLI paths and options, and version alignment across the Claude plugin, marketplace, and npm package. [Skill catalog](README.md#구성) · [License](LICENSE)

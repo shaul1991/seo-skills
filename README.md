@@ -218,7 +218,7 @@ node skills/seo-orchestrator/scripts/seo-check.mjs https://example.com/events/12
 npm test   # node --test, 의존성 없음
 ```
 
-PR과 `main` 푸시에서는 GitHub Actions가 Node 18·24로 같은 테스트를 실행합니다. `tests/fixtures/bad.html`에는 제목 키워드 반복, 상대 경로 og:image, 잘못된 JSON-LD 등 점검기가 찾아야 할 예시가 들어 있습니다.
+PR과 `main` 푸시에서는 GitHub Actions가 Node 18·24로 같은 테스트를 실행합니다. 스킬을 추가하거나 CLI 사용법을 바꿀 때는 스킬 이름·설명, 조합 스킬 목록, 문서의 CLI 경로·옵션, Claude Plugin과 npm 배포 버전의 일치도 검사합니다. `tests/fixtures/bad.html`에는 제목 키워드 반복, 상대 경로 og:image, 잘못된 JSON-LD 등 점검기가 찾아야 할 예시가 들어 있습니다.
 
 ## 라이선스
 
