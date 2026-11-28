@@ -1,121 +1,150 @@
 # Search Visibility
 
-[한국어 안내](README.md)
+[한국어](README.md)
 
-Search Visibility is a free local CLI and a collection of agent skills for technical SEO and AI search visibility. Use it to audit pages, summarize Google Search Console exports, and check whether AI answers mention your brand or cite a source you own. The CLI runs on Node.js 18 or later with no package installation or API keys.
+Audit your website for search and AI visibility. Review technical findings, Google Search performance, and brand mentions and citations from your own AI observations in local HTML and JSON reports.
 
-## Run the offline demo
+## Quickstart
 
-```sh
-git clone https://github.com/shaul1991/search-visibility.git
-cd search-visibility
-npm run demo -- --lang en
-```
-
-Open the printed `index.html` path in a browser. The demo uses two local pages, a synthetic search performance table, and three synthetic answers. The accompanying `report.json` includes machine-readable fields such as `site.pages`, `searchPerformance`, and `ai.records`.
-
-### Run the npm package
-
-Run `npm pack` in the checkout and use the generated tarball path in the commands below. The second command prints the single-page audit as JSON.
-
-```bash
-npx --yes --package=./search-visibility-0.6.0.tgz search-visibility https://example.org/ --lang en
-npx --yes --package=./search-visibility-0.6.0.tgz seo-check https://example.org/ --json
-```
-
-After publication to the npm registry, you can use `search-visibility` as the value of `--package`.
-
-## Audit a site
-
-Run a one-page audit from the repository directory. Replace the example URL with the page you want indexed.
+Requires Node.js 18 or later. This command fetches the CLI from the public GitHub repository. Replace the example URL with the page you want to audit.
 
 ```sh
-npm run visibility -- https://example.org/ --lang en
+npx --yes --package=github:shaul1991/search-visibility search-visibility https://example.org/ --lang en
 ```
 
-You can also pass the address as `--url https://example.org/`. To create a reusable starter, run the following commands and edit the example URL before the second command.
+Open `index.html` from the printed output directory and review the highest-priority FAIL and WARN findings. For repeatable runs, create a starter in a fresh working directory and edit `targets`.
 
 ```sh
-npm run visibility -- init --lang en
-npm run visibility -- ./visibility.config.json
+npx --yes --package=github:shaul1991/search-visibility search-visibility init --lang en
 ```
-
-`init` accepts an optional file path inside an existing directory and preserves existing files. The starter records the selected report language.
-
-You can also supply local HTML paths in `targets` or a sitemap URL in `sitemap`. Input paths resolve relative to the config file. Remote audits request the specified sites. Reports are written locally under `visibility-reports/`.
-
-When `sitemap` is omitted, the audit follows same-origin `Sitemap:` declarations found in the final target pages’ `robots.txt`. An explicit sitemap takes precedence. The audit runs up to four pages at a time and keeps the input and discovery order in the report. For multilingual pages, it checks HTML `hreflang` declarations for `x-default` and verifies return links between successfully audited URLs. The page report summarizes robots rules by AI crawler and purpose. These decisions describe the published rules for the final URL.
-
-Set top-level `"locale": "en"` in the config to keep English as the report language. `--lang en|ko` overrides the config. Korean is the default. Reports preserve original page text, CSV labels, and observed questions. For help in English, run `npm run visibility -- --help --lang en`. The standalone checker also accepts `--lang`.
-
-Use the [localized page audit guide](docs/localized-pages.en.md) to check canonical and indexability signals for language and regional variants.
-
-## Measure search and AI visibility
-
-- **Google search.** Set `searchConsole` to the path of a UTF-8 CSV exported from a property you can access. Import one query, page, or date table with English, Korean, Japanese, German, French, or Spanish headers for the dimension, clicks, and impressions. The report calculates CTR from the imported rows. [Import a localized CSV](docs/search-console.en.md).
-- **AI answers.** Set `brand` to your brand name, then add the answers you collected to `observations` as an array or a path to a JSON file. Each record needs `engine`, `query`, `observedAt`, `answer`, and `sources`. Use an empty list for an observed answer with no cited links. Include the observation language in `locale` when comparing markets. The CLI analyzes the supplied sample locally. [Example records](examples/demo/answers.json)
-- **Citation ownership.** Put hosts you own in `domains` to include their subdomains. For an account on a shared host, put its full HTTP(S) account URL in `ownedUrlPrefixes`. A citation counts if either rule matches. For example, `https://github.com/example-team` covers that account and its repositories. A sibling account such as `example-team-tools` is outside that scope. For a single GitHub account, use only the account prefix. Adding `github.com` to `domains` would include every account. Prefixes require a path on the same origin (scheme, host, and port). Omit credentials, query strings, and fragments.
-
-The offline HTML report shows counts by severity, lets you filter checks and sort pages by priority, and suggests fixes for common technical issues. Copy the overview to share it, or print and save to PDF with collapsed findings and evidence included.
-
-Run `npm run visibility -- compare <before/report.json> <after/report.json> --lang en` to generate an HTML and JSON comparison of site findings, Search Console performance, and AI visibility by engine.
-
-Use the [before-and-after AI citation guide](docs/ai-comparison.en.md) to compare the same questions and markets with a runnable synthetic example.
-
-For Korean search, use the [Naver, Daum and AI Briefing measurement guide](docs/korea-search.en.md).
-
-Use the [ChatGPT Search visibility guide](docs/chatgpt-search.en.md) to measure citations and website referrals.
-
-Use the [Perplexity Search citation guide](docs/perplexity-search.en.md) to record search settings and count citations to an owned account.
-
-Use the [Gemini web app source guide](docs/gemini-app.en.md) to collect public links and measure visibility by language and country.
-
-Use the [Google AI visibility guide](docs/google-ai.en.md) to interpret Search Console AI impressions and sampled citations.
-
-Use the [Bing and Copilot citation guide](docs/bing-ai.en.md) to compare Bing Webmaster Tools metrics and locally collected answers.
-
-## Install skills
-
-To install the audit and citation skills for Claude Code and Codex, run this in the project where you use the agent.
 
 ```sh
-npx skills add shaul1991/search-visibility -s seo-orchestrator ai-observations -a claude-code -a codex
+npx --yes --package=github:shaul1991/search-visibility search-visibility ./visibility.config.json --out before --lang en
 ```
 
-### Run the CLI from a single installed skill
+Deploy your changes, repeat the measurement under the same conditions, and compare the results. Use new directories for `--out`.
 
-From your project root, install just `seo-orchestrator` with the [skills CLI](https://github.com/vercel-labs/skills).
+```sh
+npx --yes --package=github:shaul1991/search-visibility search-visibility ./visibility.config.json --out after --lang en
+npx --yes --package=github:shaul1991/search-visibility search-visibility compare before/report.json after/report.json --out comparison --lang en
+```
+
+For a single-page technical audit in JSON, run the following command. Use `--expect-indexable` on pages intended for indexing. A FAIL produces exit code 1.
+
+```sh
+npx --yes --package=github:shaul1991/search-visibility seo-check https://example.org/ --expect-indexable --json --lang en
+```
+
+To see the output without auditing your site, download and open the [sample HTML report with synthetic data](https://github.com/shaul1991/search-visibility/releases/download/v0.5.0/search-visibility-demo.html).
+
+## Features
+
+| Feature | What you can check |
+| --- | --- |
+| Technical audit | HTTP redirects, robots.txt, indexing directives, canonicals, sitemaps, hreflang, sharing tags, and JSON-LD |
+| AI crawler rules | robots.txt directives for search, training, and user-triggered requests on the final URL |
+| Google Search performance | Clicks, impressions, and CTR from Search Console CSV exports |
+| AI answer observations | Brand mentions and citations to owned domains or owned profiles on shared platforms, grouped by engine |
+| Comparison reports | Changes in technical findings, Search performance, AI mention rates, and citation rates |
+
+## Measurement Toolbox
+
+Find the affected URL and evidence in the report, then verify the public URL with the tools below. Save the results and repeat the check after deployment.
+
+### Official search consoles, crawling, and submission
+
+| Official tool | What to do after the audit |
+| --- | --- |
+| [Google Search Console](https://search.google.com/search-console/about) | Use URL Inspection to check indexing and Google's selected canonical. Set the date range and filters in Performance and export CSV. |
+| [Naver Search Advisor](https://searchadvisor.naver.com/) | Check page optimization with the quick site check. Verify ownership before requesting a crawl in Webmaster Tools. |
+| [Daum Search Registration](https://register.search.daum.net/index.daum) | Register a site or blog and look up its registration status. |
+| [Bing Webmaster Tools](https://www.bing.com/webmasters/about) | Verify ownership, then inspect URLs and submit sitemaps. |
+| [IndexNow](https://www.indexnow.org/) | Notify participating engines of added, updated, or deleted URLs. Check index status with each engine after submission. |
+
+### Structured data, sharing previews, and performance
+
+| Official tool | What to do after the audit |
+| --- | --- |
+| [Google Rich Results Test](https://search.google.com/test/rich-results) | Check which Google rich result types are eligible and identify missing or invalid required properties. |
+| [Schema Markup Validator](https://validator.schema.org/) | Validate Schema.org types and properties. |
+| [Meta Sharing Debugger](https://developers.facebook.com/tools/debug/) | Inspect the link preview and scrape details, then use Scrape Again after an update. |
+| [Kakao Sharing Debugger](https://developers.kakao.com/tool/debugger/sharing) | Sign in to Kakao, review the sharing preview, and clear the cache after changing Open Graph tags. |
+| [PageSpeed Insights](https://pagespeed.web.dev/) / [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/) | Use PSI for lab metrics and any available field data on public URLs. Use Lighthouse in Chrome DevTools for local URLs. |
+
+### Measure citations in AI answers
+
+1. Run `search-visibility init` as shown in Quickstart and fill in `targets`, `brand`, and `domains`. Set `ownedUrlPrefixes` to count citations to your own profiles on shared platforms.
+2. Run your queries in ChatGPT Search, Perplexity, Google AI Overviews or AI Mode, Naver AI Briefing, and Gemini. Record each engine, query, locale, timestamp, answer, and source URLs in `observations` or a JSON file relative to the config. Keep the search mode and region with your notes so you can repeat the same conditions.
+3. To include Google Search performance, point `searchConsole` to the exported CSV. Run `search-visibility` to generate a baseline. Review the sample size, brand mention rate, and owned-source citation rate by engine.
+4. After deployment, repeat the same queries with the same engines, modes, regions, and languages. Use matching CSV filters and date-range lengths. Generate a new report and run `search-visibility compare`. Read the changes alongside sample sizes because answer variation can have several causes.
+
+## Platform and workflow guides
+
+| Topic | Guide |
+| --- | --- |
+| CLI setup and real data | [한국어](docs/workbench.ko.md) |
+| Import Search Console CSV | [한국어](docs/search-console.ko.md) · [English](docs/search-console.en.md) |
+| Localized URLs, canonical, and hreflang | [한국어](docs/localized-pages.ko.md) · [English](docs/localized-pages.en.md) |
+| Naver and Daum Search, plus Naver AI Briefing | [한국어](docs/korea-search.ko.md) · [English](docs/korea-search.en.md) |
+| ChatGPT Search citations and referrals | [한국어](docs/chatgpt-search.ko.md) · [English](docs/chatgpt-search.en.md) |
+| Perplexity observations by search mode | [한국어](docs/perplexity-search.ko.md) · [English](docs/perplexity-search.en.md) |
+| Google AI Overviews and AI Mode | [한국어](docs/google-ai.ko.md) · [English](docs/google-ai.en.md) |
+| Gemini web app source observations | [한국어](docs/gemini-app.ko.md) · [English](docs/gemini-app.en.md) |
+| Bing and Copilot citations and console metrics | [한국어](docs/bing-ai.ko.md) · [English](docs/bing-ai.en.md) |
+| AI observation conditions and before-and-after comparison | [한국어](docs/ai-comparison.ko.md) · [English](docs/ai-comparison.en.md) |
+| Open-source project comparison | [한국어](docs/landscape.ko.md) |
+
+## Install individual Agent Skills
+
+The project supports the [Agent Skills](https://agentskills.io) format. This command installs just `seo-orchestrator` for Claude Code and Codex. Replace or add names after `-s` to select other skills.
 
 ```sh
 npx skills add shaul1991/search-visibility -s seo-orchestrator -a claude-code -a codex -y
+node .agents/skills/seo-orchestrator/scripts/visibility.mjs https://example.org/ --lang en
 ```
 
-Save this synthetic sample as `visibility.config.json` in your project root. Then run the installed script with Node.js 18 or later.
+For a manual install, copy the entire skill folder into `.agents/skills/` (Codex) or `.claude/skills/` (Claude Code). Start with `seo-orchestrator` when auditing multiple channels.
 
-```json
-{
-  "brand": "Example Studio",
-  "sample": true,
-  "domains": ["bücher.example"],
-  "observations": [
-    {
-      "engine": "Synthetic",
-      "query": "어떤 서점이 있나요?",
-      "locale": "ko-KR",
-      "observedAt": "2026-01-15T12:00:00+09:00",
-      "answer": "Example Studio를 살펴보세요.",
-      "sources": ["https://xn--bcher-kva.example/books"]
-    }
-  ]
-}
+| Skill | Scope |
+| --- | --- |
+| [`seo-orchestrator`](skills/seo-orchestrator/SKILL.md) | Coordinates audits across channels and includes the CLI. |
+| [`google-search`](skills/google-search/SKILL.md) | Crawling, JavaScript, canonical URLs, sitemaps, snippets, and Search Console. |
+| [`naver-search`](skills/naver-search/SKILL.md) | Search Advisor, site verification, Yeti, sitemaps, and snippets. |
+| [`daum-search`](skills/daum-search/SKILL.md) | Daum Search Registration, webmaster tools, and previews. |
+| [`other-search-engines`](skills/other-search-engines/SKILL.md) | Bing, Brave Search, DuckDuckGo, and Apple search. |
+| [`ai-crawlers`](skills/ai-crawlers/SKILL.md) | Crawler access and directives for AI search and training. |
+| [`ai-observations`](skills/ai-observations/SKILL.md) | Brand mentions and citations to owned sites and profiles. |
+| [`structured-data`](skills/structured-data/SKILL.md) | JSON-LD examples and platform support. |
+| [`social-preview`](skills/social-preview/SKILL.md) | Open Graph, X cards, KakaoTalk, and Meta previews. |
+| [`indexnow`](skills/indexnow/SKILL.md) | Changed-URL notifications for participating engines. |
+| [`scaled-pages`](skills/scaled-pages/SKILL.md) | Indexing and canonical rules for large sets of generated pages. |
+| [`browser-compat`](skills/browser-compat/SKILL.md) | Brave Shields, favicons, manifests, and analytics behavior. |
+
+You can also install the complete set as a Claude Code plugin.
+
+```text
+/plugin marketplace add shaul1991/search-visibility
+/plugin install seo-skills@seo-skills
 ```
 
-```sh
-node .agents/skills/seo-orchestrator/scripts/visibility.mjs ./visibility.config.json
-```
+## FAQ
 
-The report shows one owned citation in one observed answer. The Unicode domain in `domains` matches the Punycode host in `sources`. The Korean question and explicit UTC offset are sample inputs. This command analyzes the supplied answer locally without contacting a search engine or AI platform. In a manual Claude Code installation, use the script under `.claude/skills/seo-orchestrator/`.
+**Does a crawlable page automatically get indexed?**
 
-## Contribute
+The audit interprets responses and crawler directives at the time of the check. Use each engine's console for its index status and selected canonical. Submissions and valid markup can help discovery or eligibility, while actual appearance depends on the platform.
 
-Regional search guidance, translated examples, and reproducible parser cases are welcome. For a locale-specific CSV issue, include synthetic headers and a representative row. Run `npm test` from the repository root when changing code. CI checks skill metadata, the orchestrator catalog, documented CLI paths and options, and version alignment across the Claude plugin, marketplace, and npm package. [Skill catalog](README.md#구성) · [License](LICENSE)
+**Does the CLI collect AI answers or search performance automatically?**
+
+The CLI summarizes performance exports and answer observations you provide. The CLI itself needs no external dependencies or API keys. Official console features that require ownership use your account on that service.
+
+**How many pages does it check, and how do I switch languages?**
+
+The CLI audits up to 25 pages by default, with up to four concurrent checks. It uses the configured sitemap when supplied, or discovers same-origin sitemaps from the final URL's robots.txt. Korean is the default, and `--lang en|ko` overrides the config's `locale`.
+
+**Can I audit local pages?**
+
+The CLI accepts local HTTP URLs. Use an accessible deployed URL for tools that need to fetch it from the web.
+
+## Sources and license
+
+[Official sources and references](REFERENCES.md) · [MIT license](LICENSE). Search Visibility is an independent open-source project. Check the latest official documentation when applying platform policies.
