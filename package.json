@@ -1,6 +1,6 @@
 {
   "name": "search-visibility",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "사이트 진단·검색 성과·AI 답변 인용을 한 번에 확인하는 무료 로컬 CLI와 Agent Skills",
   "type": "module",
   "license": "MIT",
@@ -25,7 +25,8 @@
   },
   "files": [
     "skills/seo-orchestrator/scripts/*.mjs",
-    "README.en.md"
+    "README.en.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "visibility": "node skills/seo-orchestrator/scripts/visibility.mjs",

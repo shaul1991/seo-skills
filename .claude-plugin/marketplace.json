@@ -3,7 +3,7 @@
   "owner": { "name": "shaul1991", "url": "https://github.com/shaul1991" },
   "metadata": {
     "description": "Search Visibility의 검색·AI 가시성 스킬 모음",
-    "version": "0.6.0",
+    "version": "1.0.0",
     "repository": "https://github.com/shaul1991/search-visibility"
   },
   "plugins": [

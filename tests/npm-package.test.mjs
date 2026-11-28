@@ -18,8 +18,9 @@ test("the npm tarball installs both executable commands outside the checkout", a
     );
     const [pack] = JSON.parse(npm(["pack", "--json", "--pack-destination", cwd], root));
     assert.equal(pack.name, "search-visibility");
+    assert.ok(pack.files.some(({ path }) => path === "CHANGELOG.md"));
     for (const { path } of pack.files) {
-      assert.match(path, /^(?:LICENSE|README(?:\.en)?\.md|package\.json|skills\/seo-orchestrator\/scripts\/[^/]+\.mjs)$/);
+      assert.match(path, /^(?:LICENSE|CHANGELOG\.md|README(?:\.en)?\.md|package\.json|skills\/seo-orchestrator\/scripts\/[^/]+\.mjs)$/);
     }
     await writeFile(join(cwd, "package.json"), '{"private":true}');
     npm(["install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund", join(cwd, pack.filename)]);

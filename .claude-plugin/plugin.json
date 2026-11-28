@@ -1,7 +1,7 @@
 {
   "name": "seo-skills",
   "description": "Google·네이버·Daum·Bing·Brave·Apple·AI 검색·카카오톡·Meta·X 스킬, 사이트 진단과 검색 성과·AI 인용 보고서",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "author": { "name": "shaul1991" },
   "homepage": "https://github.com/shaul1991/search-visibility",
   "repository": "https://github.com/shaul1991/search-visibility",
